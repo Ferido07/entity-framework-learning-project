@@ -1,0 +1,72 @@
+﻿@model PagedList.IPagedList<WebApplication1.Models.Student>
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+
+    @using(@Html.BeginForm("Index","Student",FormMethod.Get)){
+        @*  using the get method is useful here to make the from post using the 
+            url and hence links of the filter or search result can be shared
+            even if there was a HttpPost overload of index the form would only
+            postback to the get method. THis is useful wen we dont want the user
+            change the url for postback but also not use post method.
+            
+            if the html.beginform doesn't have any controller, action or method(FormMethod.Post) specified 
+         *  i.e. the parameter list is empty it will post to itself by default
+        *@
+        <p class="form-inline">
+            <label for="searchTB" class="control-label">Name:</label>
+             @Html.TextBox("SearchString", ViewBag.CurrentFilter as string , new {@id="searchTB", @class="form-group form-control"}) 
+            <input type="submit" value="Search" class="btn btn-default" />
+        </P> 
+    }
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.ActionLink("Last Name", "Index", new { sortOrder = ViewBag.NameSortParam, currentFilter = ViewBag.CurrentFilter })
+            @*Html.DisplayNameFor(model => model.LastName)*@
+        </th>
+        <th>
+            First Name
+        </th>
+        <th>
+            @Html.ActionLink("Enrollment Date", "Index", new { sortOrder = ViewBag.DateSortParam, currentFilter = ViewBag.CurrentFilter })
+            @*Html.DisplayNameFor(model => model.EnrollmentDate)*@
+        </th>
+        <th>
+            <!--empty header column for actions detail,edit,delete -->
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.LastName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FirstMidName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.EnrollmentDate)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ID}) |
+            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
+        </td>
+    </tr>
+}
+
+</table>
+
+<br />
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount 
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
